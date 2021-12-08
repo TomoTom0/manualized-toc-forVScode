@@ -10,7 +10,9 @@ class vsclauncherView {
 				javascript: "//",
 				python: "#",
 				c: "//",
-				cpp: "//"
+				cpp: "//",
+				bash:"#",
+				shellscript: "#"
 			},
 			head: {
 				markdown: "#"
@@ -23,28 +25,28 @@ class vsclauncherView {
 			}
 			if (symbol.comment) {
 				return [RegExp(`(?<=^\\s*${symbol.comment}\\s*)#+`),
-					RegExp(`(?<=^\\s*${symbol.comment}\\s*)#+.*`)];
+				RegExp(`(?<=^\\s*${symbol.comment}\\s*)#+.*`)];
 			} else if (symbol.head) {
 				return [RegExp(`^${symbol.head}+`), RegExp(`^${symbol.head}+.*`)];
 			} else return [];
 		}
-		const editor=vscode.window.activeTextEditor;
-		if (!editor ||!editor.document) return [{title:""}];
+		const editor = vscode.window.activeTextEditor;
+		if (!editor || !editor.document) return [{ title: "" }];
 		const lang = editor.document.languageId;
 		const cont = editor.document.getText();
 		//const eol = vscode.window.activeTextEditor.document.eol;
 		const headExp = obtainHeadRegExp(lang);
-		if (headExp.length==0 || !cont) return [{ title: "" }];
-		return cont.split("\n").map((d,ind)=>({content:d, ind:ind}))
+		if (headExp.length == 0 || !cont) return [{ title: "" }];
+		return cont.split("\n").map((d, ind) => ({ content: d, ind: ind }))
 			.filter(line => headExp[0].test(line.content))
 			.reduce((acc, line) => {
-				const head ={
+				const head = {
 					level: line.content.match(headExp[0])[0].length,
 					title: line.content.match(headExp[1])[0]
 				};
 				const length = acc.length;
-				const command=`vsclauncherView.moveFocus`;
-				const newItem={ title: head.title, command:command, arguments: [line.ind+1] };
+				const command = `vsclauncherView.moveFocus`;
+				const newItem = { title: head.title, command: command, arguments: [line.ind + 1] };
 				if (head.level < 3) {
 					acc.push(newItem);
 				} else {
@@ -84,12 +86,12 @@ class vsclauncherView {
 		return element.children;
 	}
 
-	moveFocus(listNum=1){
+	moveFocus(listNum = 1) {
 		const editor = vscode.window.activeTextEditor;
-		const lineInd=listNum || 1;
+		const lineInd = listNum || 1;
 		if (editor) {
-			editor.revealRange(new vscode.Range(lineInd, 1, lineInd+3,1),
-							vscode.TextEditorRevealType.InCenter);
+			editor.revealRange(new vscode.Range(lineInd, 1, lineInd + 3, 1),
+				vscode.TextEditorRevealType.InCenter);
 		}
 	}
 }
@@ -109,7 +111,7 @@ class TreeItem extends vscode.TreeItem {
 	}
 }
 
-const showMessage=vscode.window.showInformationMessage;
+const showMessage = vscode.window.showInformationMessage;
 
 // # activate
 /**
@@ -117,17 +119,17 @@ const showMessage=vscode.window.showInformationMessage;
  */
 function activate(context) {
 	//context;
-	const searchEditor=setInterval(()=>{
+	const searchEditor = setInterval(() => {
 		const editor = vscode.window.activeTextEditor;
-		if (editor){
+		if (editor) {
 			clearInterval(searchEditor)
 			const vscl = new vsclauncherView();
 			vscode.window.registerTreeDataProvider('vsclauncherView', vscl);
-			vscode.commands.registerCommand("vsclauncherView.moveFocus", (args)=>{vscl.moveFocus(args)});
+			vscode.commands.registerCommand("vsclauncherView.moveFocus", (args) => { vscl.moveFocus(args) });
 			vscode.workspace.onDidChangeTextDocument(() => {
 				vscode.window.registerTreeDataProvider('vsclauncherView', vscl);
 			})
-			vscode.window.onDidChangeActiveTextEditor((event)=>{
+			vscode.window.onDidChangeActiveTextEditor((event) => {
 				vscode.window.registerTreeDataProvider('vsclauncherView', vscl);
 			})
 		}
