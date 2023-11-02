@@ -2,62 +2,119 @@
 
 const vscode = require('vscode');
 
+let orange = vscode.window.createOutputChannel("Orange");
+const conf = vscode.workspace.getConfiguration("manualized_toc");
+
+
+const langp = "python"
+
 // # tree item
 class vsclauncherView {
 	data() {
-		const symbol_dic = {
-			comment: {
-				javascript: "//",
-				python: "#",
-				c: "//",
-				cpp: "//",
-				bash:"#",
-				shellscript: "#"
-			},
-			head: {
-				markdown: "#"
-			}
+		
+	const symbol_dic_default = {
+		comment: {
+			javascript: ["//"],
+			python: ["#"],
+			c: ["//"],
+			cpp: ["//"],
+			bash: ["#"],
+			shellscript: ["#"],
+			php: ["#", "//"]
+		},
+		header: {
+			markdown: ["#"]
 		}
-		const obtainHeadRegExp = (lang = "") => {
-			const symbol = {
-				comment: symbol_dic.comment[lang],
-				head: symbol_dic.head[lang]
-			}
-			if (symbol.comment) {
-				return [RegExp(`(?<=^\\s*${symbol.comment}\\s*)#+`),
-				RegExp(`(?<=^\\s*${symbol.comment}\\s*)#+.*`)];
-			} else if (symbol.head) {
-				return [RegExp(`^${symbol.head}+`), RegExp(`^${symbol.head}+.*`)];
-			} else return [];
+	};
+
+	const escapeRegExp = (phrase) => {
+		return phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+	}
+	// # parse symbols from conf
+	const parseConf = (phrase) => {
+		const arr_dic = (phrase || "").split(","
+		).map(d => {
+			const arr = d.split(":");
+			if (arr.length != 2) return null;
+			return {
+				[arr[0].trim()]: arr[1].trim().split(" "
+				).filter(dd => dd.length > 0)
+			};
 		}
+		).filter(d => d !== null);
+		if (arr_dic.length == 0) return {};
+		return Object.assign(
+			...arr_dic, {}
+		);
+	}
+	const symbol_dic_add = {
+		comment: parseConf(conf.comment_symbols),
+		header: parseConf(conf.header_symbols)
+	}
+	const symbol_dic = Object.assign( ...["comment", "header"].map(
+		key => Object({[key]: {...symbol_dic_default[key], ...symbol_dic_add[key]}}))
+	);
+
+
+	const arr2regex = (arr) => {
+		return arr.map(
+			reg_pattern =>
+				[`^\\s*${escapeRegExp(reg_pattern)}\\s*(#+)`,
+				`^\\s*${escapeRegExp(reg_pattern)}\\s*(#+.*)`]
+		);
+	}
+
+	const obtainHeadRegExp = (lang="") => {
+		return arr2regex(symbol_dic.comment[lang] || symbol_dic.header[lang] || []);
+	}
+
+	const judge_toc = (cont, headExps) => {
+		return cont.split("\n").map((d, ind) => ({ content: d, ind: ind }))
+		.reduce((acc, line) => {
+			let level_min = null;
+			let ind_min = 0;
+			const head_cands = headExps.filter(
+				headExp => headExp.length===2 && RegExp(headExp[0]).test(line.content)
+			).map((headExp, ind) => {
+				const level = line.content.match(RegExp(headExp[0]))[1].length;
+				if (level_min===null || (level_min > level && level >= 1)){
+					level_min = level;
+					ind_min = ind;
+				}
+				return {
+					level: level,
+					title: line.content.match(RegExp(headExp[1]))[1]}
+			})
+			if (head_cands.length===0) return acc;
+			const head = head_cands[ind_min];
+			const length = acc.length;
+			const command = `vsclauncherView.moveFocus`;
+			const newItem = { title: head.title, command: command, arguments: [line.ind + 1] };
+			if (head.level < 3) {
+				acc.push(newItem);
+			} else {
+				if (Object.keys(acc[length - 1]).indexOf("children") == -1) {
+					acc[length - 1].children = [newItem];
+				} else {
+					acc[length - 1].children.push(newItem);
+				}
+			}
+			return acc;
+		}, []);
+	}
 		const editor = vscode.window.activeTextEditor;
 		if (!editor || !editor.document) return [{ title: "" }];
 		const lang = editor.document.languageId;
 		const cont = editor.document.getText();
 		//const eol = vscode.window.activeTextEditor.document.eol;
-		const headExp = obtainHeadRegExp(lang);
-		if (headExp.length == 0 || !cont) return [{ title: "" }];
-		return cont.split("\n").map((d, ind) => ({ content: d, ind: ind }))
-			.filter(line => headExp[0].test(line.content))
-			.reduce((acc, line) => {
-				const head = {
-					level: line.content.match(headExp[0])[0].length,
-					title: line.content.match(headExp[1])[0]
-				};
-				const length = acc.length;
-				const command = `vsclauncherView.moveFocus`;
-				const newItem = { title: head.title, command: command, arguments: [line.ind + 1] };
-				if (head.level < 3) {
-					acc.push(newItem);
-				} else {
-					if (Object.keys(acc[length - 1]).indexOf("children") == -1) {
-						acc[length - 1].children = [newItem];
-					} else {
-						acc[length - 1].children.push(newItem);
-					}
-				}
-				return acc;
-			}, []);
+		
+		const headExps = obtainHeadRegExp(lang);
+		// orange.appendLine(JSON.stringify(symbol_dic));
+		// orange.show();
+
+		if (headExps.length == 0 || !cont) return [{ title: "" }];
+		return judge_toc(cont, headExps);
+
 	}
 
 	constructor() {

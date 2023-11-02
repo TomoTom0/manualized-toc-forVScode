@@ -3,7 +3,7 @@
   "displayName": "manualized-toc",
   "publisher":"tomo-iris",
   "description": ".",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.54.0"
   },
@@ -11,7 +11,7 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onStartupFinished"
   ],
   "main": "./extension.js",
   "contributes": {
@@ -22,16 +22,33 @@
               "name": "TOC"
           }
       ]
-  },
-  "viewsContainers": {
-    "activitybar": [
-        {
-            "id": "vsclauncher",
-            "title": "TOC",
-            "icon": "img/tmp.svg"
+    },
+    "viewsContainers": {
+      "activitybar": [
+          {
+              "id": "vsclauncher",
+              "title": "TOC",
+              "icon": "img/tmp.svg"
+          }
+      ]
+    },
+    "configuration":{
+      "title":"manualized_toc",
+      "properties": {
+        "manualized_toc.comment_symbols":{
+          "type":"string",
+          "description":"update information for comment out symbols joining with spaces,\nyou should check https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers to know the expression for language\n`<lang>: <symbols> <symbols>, <lang2>: <symbols> ...`"
+        },
+        "manualized_toc.header_symbols":{
+          "type":"string",
+          "description":"update information for header symbols,\nhead symbols are referred only when comment out symbols are not found\n`<lang>: <symbols> <symbols>, <lang2>: <symbols> ...`"
         }
-    ]
-}
+      }
+    }
+  },
+  "repository":{
+    "type": "git",
+    "url":"https://github.com/TomoTom0/manualized-toc-forVScode.git"
   },
   "scripts": {
     "lint": "eslint .",
@@ -50,3 +67,4 @@
     "vscode-test": "^1.5.0"
   }
 }
+
