@@ -37,13 +37,19 @@
       "properties": {
         "manualized_toc.comment_symbols":{
           "type":"string",
-          "description":"update information for comment out symbols joining with spaces, which you can URI encode,\nyou should check https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers to know the expression for language\n`<lang>: <symbols> <symbols>, <lang2>: <symbols> ...`"
+          "description":"update information for comment out symbols joining with spaces,\nyou should check https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers to know the expression for language\n`<lang>: <symbols> <symbols>, <lang2>: <symbols> ...`"
         },
         "manualized_toc.header_symbols":{
           "type":"string",
-          "description":"update information for header symbols, which you can URI encode,\nhead symbols are referred only when comment out symbols are not found\n`<lang>: <symbols> <symbols>, <lang2>: <symbols> ...`"
+          "description":"update information for header symbols,\n`<lang>: <symbols>, <lang2>: <symbols> ...`"
         },
-        "manualized_toc.require_spaces":{
+        "manualized_toc.depth_parent_max":{
+          "type":"integer",
+          "default":3,
+          "enum":[0,1,2,3,4,5,6],
+          "description":"Contents with larger depth in TOC are folded as children. No contents are folded if the inputted value is not positive."
+        },
+        "manualized_toc.require_spaces_after":{
           "type":"boolean",
           "default":false,
           "description":"require spaces afetr header symbols"

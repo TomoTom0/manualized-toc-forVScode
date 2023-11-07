@@ -38,7 +38,7 @@ class vsclauncherView {
 			if (arr.length != 2) return null;
 			return {
 				[arr[0].trim()]: arr[1].trim().split(" "
-				).filter(dd => dd.length > 0).map(dd=>decodeURI(dd))
+				).filter(dd => dd.length > 0)//.map(dd=>decodeURI(dd))
 			};
 		}
 		).filter(d => d !== null);
@@ -49,49 +49,49 @@ class vsclauncherView {
 		);
 	}
 	const symbol_dic_add = {
-		comment: parseConf(conf.comment_symbols),
+		comment: parseConf(conf.comment_symbols) || [],
 		header: parseConf(conf.header_symbols) || ["#"]
 	}
 	// @ts-ignore
 	const symbol_dic = Object.assign( ...["comment", "header"].map(
 		key => Object({[key]: {...symbol_dic_default[key], ...symbol_dic_add[key]}}))
 	);
+	// orange.appendLine(JSON.stringify(symbol_dic));
+	// orange.show();
 
 
-	const arr2regex = (arr_comment, arr_header) => {
-		if (arr_comment.length==0){
+	const arr2regex = (arr_comment, sym_header) => {
+	
+		if (arr_comment==undefined || arr_comment.length==0){
 			arr_comment = [""]
 		}
-		if (arr_header.length==0){
-			arr_header = ["#"]
-		}
+		// if (conf.require_spaces_before===true) {
+		// 	arr_comment = arr_comment.map(d=>d+"\s+");
+		// }
 		return arr_comment.map(
-			reg_pattern => {
-				const sym_header=arr_header[0];
-				if (conf.require_spaces===true){
-					return [`^\\s*${escapeRegExp(reg_pattern)}\\s*(${sym_header}+)\s`,
-				`^\\s*${escapeRegExp(reg_pattern)}\\s*(${sym_header}+.*)`]
-				} else {
-					return [`^\\s*${escapeRegExp(reg_pattern)}\\s*(${sym_header}+)`,
-					`^\\s*${escapeRegExp(reg_pattern)}\\s*(${sym_header}+.*)`]	
-				}
-			}
+			reg_pattern => 
+				[`^\\s*${escapeRegExp(reg_pattern)}\\s*([${sym_header}]+)`+
+					(conf.require_spaces_after===true ? "\\s+\\S+" : "\\s*\\S+"),
+				`^\\s*${escapeRegExp(reg_pattern)}\\s*([${sym_header}]+.*)`]
 		);
 	}
-
+	const obtain_symHeader = (lang ="") => (
+		symbol_dic.header[lang]!=undefined &&
+		 symbol_dic.header[lang].length>0) ? symbol_dic.header[lang][0] : "#";
 	const obtainHeadRegExp = (lang="") => {
-		return arr2regex(symbol_dic.comment[lang] , symbol_dic.header[lang] );
+		return arr2regex(symbol_dic.comment[lang] , obtain_symHeader(lang) );
 	}
 
-	const judge_toc = (cont, headExps) => {
+	const judge_toc = (cont, headExps, sym_header) => {
 		return cont.split("\n").map((d, ind) => ({ content: d, ind: ind }))
-		.reduce((acc, line) => {
+		.reduce((acc, line) => {		
 			let level_min = null;
 			let ind_min = 0;
 			const head_cands = headExps.filter(
 				headExp => headExp.length===2 && RegExp(headExp[0]).test(line.content)
 			).map((headExp, ind) => {
-				const level = line.content.match(RegExp(headExp[0]))[1].length;
+				
+				const level = parseInt(line.content.match(RegExp(headExp[0]))[1].length / sym_header.length);
 				if (level_min===null || (level_min > level && level >= 1)){
 					level_min = level;
 					ind_min = ind;
@@ -105,7 +105,7 @@ class vsclauncherView {
 			const length = acc.length;
 			const command = `vsclauncherView.moveFocus`;
 			const newItem = { title: head.title, command: command, arguments: [line.ind + 1] };
-			if (head.level < 3) {
+			if (conf.depth_parent_max <= 0 || head.level <= conf.depth_parent_max) {
 				acc.push(newItem);
 			} else {
 				if (Object.keys(acc[length - 1]).indexOf("children") == -1) {
@@ -124,11 +124,11 @@ class vsclauncherView {
 		//const eol = vscode.window.activeTextEditor.document.eol;
 		
 		const headExps = obtainHeadRegExp(lang);
-		// orange.appendLine(JSON.stringify(symbol_dic));
+		// orange.appendLine(127, headExps);
 		// orange.show();
 
 		if (headExps.length == 0 || !cont) return [{ title: "" }];
-		return judge_toc(cont, headExps);
+		return judge_toc(cont, headExps, obtain_symHeader(lang) );
 
 	}
 
