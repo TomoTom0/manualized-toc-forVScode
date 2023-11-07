@@ -3,7 +3,7 @@
   "displayName": "manualized-toc",
   "publisher":"tomo-iris",
   "description": ".",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "engines": {
     "vscode": "^1.54.0"
   },
@@ -42,6 +42,12 @@
         "manualized_toc.header_symbols":{
           "type":"string",
           "description":"update information for header symbols,\nhead symbols are referred only when comment out symbols are not found\n`<lang>: <symbols> <symbols>, <lang2>: <symbols> ...`"
+        },
+        "manualized_toc.depth_parent_max":{
+          "type":"integer",
+          "default":3,
+          "enum":[0,1,2,3,4,5,6],
+          "description":"Contents with larger depth in TOC are folded as children. No contents are folded if the inputted value is not positive."
         }
       }
     }

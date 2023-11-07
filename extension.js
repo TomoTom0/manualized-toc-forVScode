@@ -2,11 +2,8 @@
 
 const vscode = require('vscode');
 
-let orange = vscode.window.createOutputChannel("Orange");
+// let orange = vscode.window.createOutputChannel("Orange");
 const conf = vscode.workspace.getConfiguration("manualized_toc");
-
-
-const langp = "python"
 
 // # tree item
 class vsclauncherView {
@@ -90,7 +87,7 @@ class vsclauncherView {
 			const length = acc.length;
 			const command = `vsclauncherView.moveFocus`;
 			const newItem = { title: head.title, command: command, arguments: [line.ind + 1] };
-			if (head.level < 3) {
+			if (conf.depth_parent_max <= 0 || head.level <= conf.depth_parent_max) {
 				acc.push(newItem);
 			} else {
 				if (Object.keys(acc[length - 1]).indexOf("children") == -1) {
