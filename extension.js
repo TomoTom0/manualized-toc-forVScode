@@ -6,7 +6,7 @@ let orange = vscode.window.createOutputChannel("Orange");
 const conf = vscode.workspace.getConfiguration("manualized_toc");
 
 
-const langp = "python"
+// const langp = "python"
 
 // # tree item
 class vsclauncherView {
@@ -38,34 +38,49 @@ class vsclauncherView {
 			if (arr.length != 2) return null;
 			return {
 				[arr[0].trim()]: arr[1].trim().split(" "
-				).filter(dd => dd.length > 0)
+				).filter(dd => dd.length > 0).map(dd=>decodeURI(dd))
 			};
 		}
 		).filter(d => d !== null);
 		if (arr_dic.length == 0) return {};
 		return Object.assign(
+			// @ts-ignore
 			...arr_dic, {}
 		);
 	}
 	const symbol_dic_add = {
 		comment: parseConf(conf.comment_symbols),
-		header: parseConf(conf.header_symbols)
+		header: parseConf(conf.header_symbols) || ["#"]
 	}
+	// @ts-ignore
 	const symbol_dic = Object.assign( ...["comment", "header"].map(
 		key => Object({[key]: {...symbol_dic_default[key], ...symbol_dic_add[key]}}))
 	);
 
 
-	const arr2regex = (arr) => {
-		return arr.map(
-			reg_pattern =>
-				[`^\\s*${escapeRegExp(reg_pattern)}\\s*(#+)`,
-				`^\\s*${escapeRegExp(reg_pattern)}\\s*(#+.*)`]
+	const arr2regex = (arr_comment, arr_header) => {
+		if (arr_comment.length==0){
+			arr_comment = [""]
+		}
+		if (arr_header.length==0){
+			arr_header = ["#"]
+		}
+		return arr_comment.map(
+			reg_pattern => {
+				const sym_header=arr_header[0];
+				if (conf.require_spaces===true){
+					return [`^\\s*${escapeRegExp(reg_pattern)}\\s*(${sym_header}+)\s`,
+				`^\\s*${escapeRegExp(reg_pattern)}\\s*(${sym_header}+.*)`]
+				} else {
+					return [`^\\s*${escapeRegExp(reg_pattern)}\\s*(${sym_header}+)`,
+					`^\\s*${escapeRegExp(reg_pattern)}\\s*(${sym_header}+.*)`]	
+				}
+			}
 		);
 	}
 
 	const obtainHeadRegExp = (lang="") => {
-		return arr2regex(symbol_dic.comment[lang] || symbol_dic.header[lang] || []);
+		return arr2regex(symbol_dic.comment[lang] , symbol_dic.header[lang] );
 	}
 
 	const judge_toc = (cont, headExps) => {
