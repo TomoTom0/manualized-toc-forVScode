@@ -1,9 +1,9 @@
 {
   "name": "manualized-toc",
   "displayName": "manualized-toc",
-  "publisher":"tomo-iris",
+  "publisher": "tomo-iris",
   "description": ".",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "engines": {
     "vscode": "^1.54.0"
   },
@@ -17,49 +17,57 @@
   "contributes": {
     "views": {
       "vsclauncher": [
-          {
-              "id": "vsclauncherView",
-              "name": "TOC"
-          }
+        {
+          "id": "vsclauncherView",
+          "name": "TOC"
+        }
       ]
     },
     "viewsContainers": {
       "activitybar": [
-          {
-              "id": "vsclauncher",
-              "title": "TOC",
-              "icon": "img/tmp.svg"
-          }
+        {
+          "id": "vsclauncher",
+          "title": "TOC",
+          "icon": "img/tmp.svg"
+        }
       ]
     },
-    "configuration":{
-      "title":"manualized_toc",
+    "configuration": {
+      "title": "manualized_toc",
       "properties": {
-        "manualized_toc.comment_symbols":{
-          "type":"string",
-          "description":"update information for comment out symbols joining with spaces,\nyou should check https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers to know the expression for language\n`<lang>: <symbols> <symbols>, <lang2>: <symbols> ...`"
+        "manualized_toc.comment_symbols": {
+          "type": "string",
+          "description": "update information for comment out symbols joining with spaces,\nyou should check https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers to know the expression for language\n`<lang>: <symbols> <symbols>, <lang2>: <symbols> ...`"
         },
-        "manualized_toc.header_symbols":{
-          "type":"string",
-          "description":"update information for header symbols,\n`<lang>: <symbols>, <lang2>: <symbols> ...`"
+        "manualized_toc.header_symbols": {
+          "type": "string",
+          "description": "update information for header symbols,\n`<lang>: <symbols>, <lang2>: <symbols> ...`"
         },
-        "manualized_toc.depth_parent_max":{
-          "type":"integer",
-          "default":3,
-          "enum":[0,1,2,3,4,5,6],
-          "description":"Contents with larger depth in TOC are folded as children. No contents are folded if the inputted value is not positive."
+        "manualized_toc.depth_parent_max": {
+          "type": "integer",
+          "default": 3,
+          "enum": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "description": "Contents with larger depth in TOC are folded as children. No contents are folded if the inputted value is not positive."
         },
-        "manualized_toc.require_spaces_after":{
-          "type":"boolean",
-          "default":false,
-          "description":"require spaces afetr header symbols"
+        "manualized_toc.require_spaces_after": {
+          "type": "boolean",
+          "default": false,
+          "description": "require spaces afetr header symbols"
         }
       }
     }
   },
-  "repository":{
+  "repository": {
     "type": "git",
-    "url":"https://github.com/TomoTom0/manualized-toc-forVScode.git"
+    "url": "https://github.com/TomoTom0/manualized-toc-forVScode.git"
   },
   "scripts": {
     "lint": "eslint .",
@@ -76,6 +84,8 @@
     "mocha": "^8.2.1",
     "typescript": "^4.1.3",
     "vscode-test": "^1.5.0"
+  },
+  "dependencies": {
+    "vsce": "^2.15.0"
   }
 }
-

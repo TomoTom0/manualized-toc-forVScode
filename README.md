@@ -2,7 +2,7 @@
 
 ## Install
 
-You can install this extension with `manualized-toc-X.X.X.vsix` in `Extension: install from VSIX` at Command Pallet (Ctrl+Shift+P).
+You can install this extension with `manualized-toc-X.X.X.vsix` in `Extension: install from VSIX` at Command Pallet (Ctrl+Shift+P) or from VSCode Extension Store (search `manualized_toc`).
 
 ## feature
 

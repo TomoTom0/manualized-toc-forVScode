@@ -20,7 +20,8 @@ class vsclauncherView {
 			cpp: ["//"],
 			bash: ["#"],
 			shellscript: ["#"],
-			php: ["#", "//"]
+			php: ["#", "//"],
+			typescript: ["//"],
 		},
 		header: {
 			markdown: ["#"]
