@@ -1,4 +1,4 @@
-# manualized-toc
+# Manualized Toc for VSCode
 
 ## Install
 

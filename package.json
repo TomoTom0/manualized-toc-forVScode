@@ -1,11 +1,11 @@
 {
   "name": "manualized-toc",
-  "displayName": "manualized-toc",
+  "displayName": "Manualized Toc",
   "publisher": "tomo-iris",
-  "description": ".",
+  "description": "generate TOC from comments, i.e., you can edit them manually",
   "version": "1.2.0",
   "engines": {
-    "vscode": "^1.54.0"
+    "vscode": "^1.91.0"
   },
   "categories": [
     "Other"
@@ -28,7 +28,7 @@
         {
           "id": "vsclauncher",
           "title": "TOC",
-          "icon": "img/tmp.svg"
+          "icon": "img/toc-icon.svg"
         }
       ]
     },
@@ -36,12 +36,25 @@
       "title": "manualized_toc",
       "properties": {
         "manualized_toc.comment_symbols": {
-          "type": "string",
-          "description": "update information for comment out symbols joining with spaces,\nyou should check https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers to know the expression for language\n`<lang>: <symbols> <symbols>, <lang2>: <symbols> ...`"
+          "type": "object",
+          "description": "update information for comment out symbols joining with spaces,\nyou should check https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers to know the expression for language\n`<lang>: <symbols> <symbols>, <lang2>: <symbols> ...`",
+          "default": {
+              "javascript": ["//"],
+              "python": ["#"],
+              "c": ["//"],
+              "cpp": ["//"],
+              "bash": ["#"],
+              "shellscript": ["#"],
+              "php": ["#", "//"],
+              "typescript": ["//"]
+          }
         },
         "manualized_toc.header_symbols": {
-          "type": "string",
-          "description": "update information for header symbols,\n`<lang>: <symbols>, <lang2>: <symbols> ...`"
+          "type": "object",
+          "description": "update information for header symbols,\n`<lang>: <symbols>, <lang2>: <symbols> ...`",
+          "default":{
+            "markdown": ["#"]
+        }
         },
         "manualized_toc.depth_parent_max": {
           "type": "integer",
@@ -70,9 +83,18 @@
     "url": "https://github.com/TomoTom0/manualized-toc-forVScode.git"
   },
   "scripts": {
-    "lint": "eslint .",
-    "pretest": "npm run lint",
-    "test": "node ./test/runTest.js"
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",

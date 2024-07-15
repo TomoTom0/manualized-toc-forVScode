@@ -3,3 +3,10 @@ node_modules
 .*
 .env
 .memo*
+
+out
+dist
+*.vsix
+
+memo/
+escape/
