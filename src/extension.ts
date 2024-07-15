@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 // let orange = vscode.window.createOutputChannel("Orange");
-const CONF = vscode.workspace.getConfiguration("manualized_toc");
+// const CONF = vscode.workspace.getConfiguration("manualized_toc");
 
 interface SymbolDic {
     comment: { [key: string]: string[] };
@@ -44,15 +44,15 @@ class MakeToc {
         this.editor = editor;
         this.text = editor.document.getText();
     }
+    get conf() {
+        return vscode.workspace.getConfiguration("manualized_toc");
+    }
     get symbolDic(): SymbolDic {
         return {
-            comment: Object.assign(SYMBOL_DIC_DEFAULT.comment, CONF.comment_symbols),
-            header: Object.assign(SYMBOL_DIC_DEFAULT.header, CONF.header_symbols),
-        }
+            comment: Object.assign(SYMBOL_DIC_DEFAULT.comment, this.conf.comment_symbols),
+            header: Object.assign(SYMBOL_DIC_DEFAULT.header, this.conf.header_symbols),
+        };
     }
-    // set text(text: string) {
-    //     this.text = text;
-    // }
     public line: string = "";
     public lineNum: number = 0;
     private levelMin: number | null = null;
@@ -83,7 +83,7 @@ class MakeToc {
         for (const str_symComment of arr_symComment) {
             arr_regexs.push(
                 `^\\s*${str_symComment}\\s*([${str_symHeader}]+)` +
-                (CONF.require_spaces_after ? "\\s" : "") + "\\s*(.*?)\\s*$"
+                (this.conf.require_spaces_after ? "\\s" : "") + "\\s*(.*?)\\s*$"
             );
             // arr_regexs.push(
             //     `^\\s*${str_symComment}\\s*([${str_symHeader}]+.*)`
@@ -94,6 +94,8 @@ class MakeToc {
 
     private obtain_header(): HeadInfo | null {
         const arr_regHeader = this.arr_regHeader;
+        // console.log(this.arr_symComment, arr_regHeader);
+
         for (const regHeader of arr_regHeader) {
             const resHeader = this.line.match(RegExp(regHeader));
             if (!resHeader) { continue; }
@@ -129,7 +131,7 @@ class MakeToc {
         const length = this.arr_result_toc.length;
         const lastItem = this.arr_result_toc[length - 1];
 
-        if (CONF.depth_parent_max <= 0 || headInfo.level <= CONF.depth_parent_max) {
+        if (this.conf.depth_parent_max <= 0 || headInfo.level <= this.conf.depth_parent_max) {
             this.arr_result_toc.push(newItem);
         } else {
             if (!lastItem.children) {
@@ -205,7 +207,7 @@ class TreeItem extends vscode.TreeItem {
     }
 }
 
-const showMessage = vscode.window.showInformationMessage;
+// const showMessage = vscode.window.showInformationMessage;
 
 export function activate(context: vscode.ExtensionContext) {
     const searchEditor = setInterval(() => {
