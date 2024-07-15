@@ -1,8 +1,8 @@
-# manualized-toc
+# Manualized Toc for VSCode
 
 ## Install
 
-You can install this extension with `manualized-toc-X.X.X.vsix` in `Extension: install from VSIX` at Command Pallet (Ctrl+Shift+P).
+You can install this extension with `manualized-toc-X.X.X.vsix` in `Extension: install from VSIX` at Command Pallet (Ctrl+Shift+P) or from VSCode Extension Store (search `manualized_toc`).
 
 ## feature
 
@@ -13,7 +13,7 @@ This extension adds TOC into the sidebar whose contents are made from the file c
     - python: `# #`
     - php: `# #` or `// #`
     - you can add spaces or tabs before/after comment symbol.
-- TOC with Header Symbols: (for markdown): `^# + Header` (the number of `#` means the intent of the header)
+- TOC with Header Symbols: (for markdown): `^#+ Header` (the number of `#` means the intent of the header)
 
 You can move by clicking the content in TOC such like Jupyter TOC extension.
 
