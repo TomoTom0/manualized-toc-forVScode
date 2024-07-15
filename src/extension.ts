@@ -43,6 +43,10 @@ class MakeToc {
     constructor(editor: vscode.TextEditor) {
         this.editor = editor;
         this.text = editor.document.getText();
+        if (this.lang === "markdown") {
+            // markdownの場合、コードブロックは除外
+            this.text = this.text.replace(/```[\s\S]*?```/g, "\n");
+        }
     }
     get conf() {
         return vscode.workspace.getConfiguration("manualized_toc");
