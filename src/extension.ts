@@ -57,7 +57,7 @@ class MakeToc {
     public lineNum: number = 0;
     private levelMin: number | null = null;
     // private indMin: number = 0;
-    private *nextLine(){
+    private *nextLine() {
         for (const line of this.text.split("\n")) {
             this.lineNum += 1;
             this.line = line;
@@ -96,7 +96,7 @@ class MakeToc {
         const arr_regHeader = this.arr_regHeader;
         for (const regHeader of arr_regHeader) {
             const resHeader = this.line.match(RegExp(regHeader));
-            if (!resHeader) continue;
+            if (!resHeader) { continue; }
             const level = Math.floor(resHeader[1].length / this.str_symHeader.length);
             if (this.levelMin === null || (this.levelMin > level && level >= 1)) {
                 this.levelMin = level;
@@ -118,10 +118,14 @@ class MakeToc {
     }
     private makeToc_line() {
         const headInfo = this.obtain_header();
-        if (!headInfo) return null;
+        if (!headInfo) { return null; }
 
         const command = `vsclauncherView.moveFocus`;
-        const newItem = { title: headInfo.title, command: command, arguments: [this.lineNum + 1] };
+        const newItem = {
+            title: "#".repeat(headInfo.level) + " " + headInfo.title,
+            command: command,
+            arguments: [this.lineNum + 1]
+        };
         const length = this.arr_result_toc.length;
         const lastItem = this.arr_result_toc[length - 1];
 
@@ -135,43 +139,9 @@ class MakeToc {
             }
         }
 
-
-        // if (head_cands.length === 0) return acc;
-        // const head = head_cands[ind_min];
-        // const length = acc.length;
-        // const command = `vsclauncherView.moveFocus`;
-        // const newItem = { title: head.title, command: command, arguments: [line.ind + 1] };
-        // if (CONF.depth_parent_max <= 0 || head.level <= CONF.depth_parent_max) {
-        //     acc.push(newItem);
-        // } else {
-        //     if (!acc[length - 1].children) {
-        //         acc[length - 1].children = [newItem];
-        //     } else {
-        //         acc[length - 1].children.push(newItem);
-        //     }
-        // }
-        // return acc;
     }
 
-    // const arr2regex = (arr_comment: string[], sym_header: string) => {
-    //     if (!arr_comment || arr_comment.length === 0) {
-    //         arr_comment = [""];
-    //     }
-    //     return arr_comment.map(
-    //         reg_pattern =>
-    //             [`^\\s*${escapeRegExp(reg_pattern)}\\s*([${sym_header}]+)` +
-    //                 (CONF.require_spaces_after ? "\\s+\\S+" : "\\s*\\S+"),
-    //             `^\\s*${escapeRegExp(reg_pattern)}\\s*([${sym_header}]+.*)`]
-    //     );
-    // };
 
-    // const obtain_symHeader = (lang: string = "") => (
-    //     symbol_dic.header[lang] && symbol_dic.header[lang].length > 0) ? symbol_dic.header[lang][0] : "#";
-
-    // const obtainHeadRegExp = (lang: string = "") => {
-    //     return arr2regex(symbol_dic.comment[lang], obtain_symHeader(lang));
-    // };
-    
 }
 
 class vsclauncherView implements vscode.TreeDataProvider<TreeItem> {
@@ -181,7 +151,7 @@ class vsclauncherView implements vscode.TreeDataProvider<TreeItem> {
     data() {
 
         const editor = vscode.window.activeTextEditor;
-        if (!editor || !editor.document) return [{ title: "" }];
+        if (!editor || !editor.document) { return [{ title: "" }]; }
         const makeToc = new MakeToc(editor);
         makeToc.makeToc_all();
         return makeToc.arr_result_toc;
@@ -245,7 +215,7 @@ export function activate(context: vscode.ExtensionContext) {
             const vscl = new vsclauncherView();
             vscode.window.registerTreeDataProvider('vsclauncherView', vscl);
             vscode.commands.registerCommand("vsclauncherView.moveFocus", (args) => {
-                vscl.moveFocus(args)
+                vscl.moveFocus(args);
             });
             vscode.workspace.onDidChangeTextDocument(() => {
                 vscode.window.registerTreeDataProvider('vsclauncherView', vscl);
@@ -254,7 +224,7 @@ export function activate(context: vscode.ExtensionContext) {
                 vscode.window.registerTreeDataProvider('vsclauncherView', vscl);
             });
         }
-    }, 100)
+    }, 100);
 }
 
 // this method is called when your extension is deactivated
@@ -263,4 +233,4 @@ function deactivate() { }
 module.exports = {
     activate,
     deactivate
-}
+};
