@@ -1,6 +1,7 @@
 {
   "name": "manualized-toc",
   "displayName": "Manualized TOC",
+  "publisher": "tomo-iris",
   "description": "generate TOC from comments, i.e., you can edit them manually",
   "version": "1.3.0",
   "icon": "img/VSCodeExt-Icon_Manualized-Toc.drawio.png",
