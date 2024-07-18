@@ -1,7 +1,6 @@
-import * as vscode from 'vscode';
+// # import, interface, const
 
-// let orange = vscode.window.createOutputChannel("Orange");
-// const CONF = vscode.workspace.getConfiguration("manualized_toc");
+import * as vscode from 'vscode';
 
 interface SymbolDic {
     comment: { [key: string]: string[] };
@@ -24,6 +23,7 @@ const SYMBOL_DIC_DEFAULT: SymbolDic = {
     }
 };
 
+// # class Make TOC
 interface HeadInfo {
     level: number;
     title: string;
@@ -37,7 +37,6 @@ interface ResultToc {
 }
 
 class MakeToc {
-    // public text: string;
     public editor: vscode.TextEditor;
     public text: string;
     constructor(editor: vscode.TextEditor) {
@@ -57,6 +56,7 @@ class MakeToc {
             header: Object.assign(SYMBOL_DIC_DEFAULT.header, this.conf.header_symbols),
         };
     }
+    // ## obtain line
     public line: string = "";
     public lineNum: number = 0;
     private levelMin: number | null = null;
@@ -89,16 +89,12 @@ class MakeToc {
                 `^\\s*${str_symComment}\\s*([${str_symHeader}]+)` +
                 (this.conf.require_spaces_after ? "\\s" : "") + "\\s*(.*?)\\s*$"
             );
-            // arr_regexs.push(
-            //     `^\\s*${str_symComment}\\s*([${str_symHeader}]+.*)`
-            // );
         }
         return arr_regexs;
     }
-
+    // ## obtain header
     private obtain_header(): HeadInfo | null {
         const arr_regHeader = this.arr_regHeader;
-        // console.log(this.arr_symComment, arr_regHeader);
 
         for (const regHeader of arr_regHeader) {
             const resHeader = this.line.match(RegExp(regHeader));
@@ -150,6 +146,7 @@ class MakeToc {
 
 }
 
+// # class vsclauncherView
 class vsclauncherView implements vscode.TreeDataProvider<TreeItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined> = new vscode.EventEmitter<TreeItem | undefined>();
     readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined> = this._onDidChangeTreeData.event;
@@ -195,6 +192,7 @@ class vsclauncherView implements vscode.TreeDataProvider<TreeItem> {
     }
 }
 
+// # class TreeItem
 class TreeItem extends vscode.TreeItem {
     children?: TreeItem[];
 
@@ -211,9 +209,8 @@ class TreeItem extends vscode.TreeItem {
     }
 }
 
-// const showMessage = vscode.window.showInformationMessage;
-
 export function activate(context: vscode.ExtensionContext) {
+    // # search Editor
     const searchEditor = setInterval(() => {
         const editor = vscode.window.activeTextEditor;
         if (editor) {
@@ -233,7 +230,6 @@ export function activate(context: vscode.ExtensionContext) {
     }, 100);
 }
 
-// this method is called when your extension is deactivated
 function deactivate() { }
 
 module.exports = {

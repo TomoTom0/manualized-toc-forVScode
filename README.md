@@ -6,6 +6,8 @@ You can install this extension with `manualized-toc-X.X.X.vsix` in `Extension: i
 
 ## feature
 
+![The Demo of Manualized TOC](imgs/README/Manualized-Toc_Demo.gif)
+
 This extension adds TOC into the sidebar whose contents are made from the file content.
 
 - TOC with Comment Symbols (for program languages): `comment symbol + # + HeaderTitle` (the number of `#` means the header level)
